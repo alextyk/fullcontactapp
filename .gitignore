@@ -1,2 +1,5 @@
 node_modules/
 datadir/
+config/local.json
+
+*.DS_Store

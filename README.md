@@ -1,32 +1,15 @@
 # Full Contact App
 
-## Start nginx
+## Start docker
 
 ```sh
-docker run --name hs-demo-nginx \
-   -v $PWD/static:/usr/share/nginx/html:ro \
-   -v $PWD/conf.`d:/etc/nginx/conf.d:ro \
-   -p 80 \
-   -p 443 \
-   -d nginx
+docker-compose up
 ````
 
-Verify by going to
+Verify
 
-```sh
-open http://$(docker port hs-demo-nginx 80)/hs_stream_demo.html
 ````
-
-## Create the tunnel
-
-This is required for the content source demo as Hootsuite needs to verify access
-the image to be loaded into ow.ly
-
-```sh
-docker run --name hs-demo-ngrok \
-    -p 4040 \
-    --link hs-demo-nginx:http \
-    -d wernight/ngrok ngrok http hs-demo-nginx:80
+open $(curl -Ls $(docker port fullcontactapp_ngrok_1 4040)/api/tunnels/command_line | python -c 'import sys, json; print json.load(sys.stdin)["public_url"]')/fullcontact_plugin.html
 ````
 
 Get the ngrok URL
@@ -35,50 +18,37 @@ Get the ngrok URL
 curl -Ls $(docker port fullcontactapp_ngrok_1 4040)/api/tunnels/command_line | python -c 'import sys, json; print json.load(sys.stdin)["public_url"]'
 ````
 
-Verify:
-
-````
-open $(curl -Ls $(docker port fullcontactapp_ngrok_1 4040)/api/tunnels/command_line | python -c 'import sys, json; print json.load(sys.stdin)["public_url"]')/hs_stream_demo.html
-````
-
 View the traffic
 
 ````
-open http://$(docker port hs-demo-ngrok 4040)
+open http://$(docker port fullcontactapp_ngrok_1 4040)
 ````
-
-Edit assets/js/vars.js and set the publicHostname to the ngork url
 
 ## Configure
 
+### Full Contact
+
+Go to the Full Contact Portal https://portal.fullcontact.com and download your API key.
+
+In the config directory copy default.json to local.json and add your full contact API key.  For production create a production.json file and set the environment NODE_ENV=production.
+
+### Hootsuite
+
 Go to Hootsuite Developer portal https://hootsuite.com/developers/my-apps
 
-Create a New App, set the name and description and press Create.
+Create a New App, set the name and description.
+
+Set the Icon and Logo to <ngrok url>/assets/icon16.png and <ngrok url>/assets/icon256.png respectively and press Create.
 
 Click on the new App link.  Click the Edit button.
 
 Set the Authentication Type to Single Sign On and set the shared secret to:
 hsdemosharedsecret and press Save.
 
-Click New App Component.  Select App Component Type of Stream, set the App Component
-Title and press Add.
-
-For the new stream App Component click on the Edit button and set
-
-IFrame URL: <ngrok url>/hs_stream_demo.html
-Icon URL: <ngrok url>/asset/icon.png
-
-Press the Save button.
-
 Add a New App Component with Type Plugin
 
-IFrame URL: <ngrok url>/hs_plugin_demo.html
-Icon URL: <ngrok url>/asset/icon.png
-
-Add a New App Component with Type Content Source
-
-IFrame URL: <ngrok url>/content_source_demo.html
-Icon URL: <ngrok url>/asset/icon.png
+Service URL: <ngrok url>/fullcontact_plugin.html
+Icon URL: <ngrok url>/assets/icon30.png
 
 ## Add the App to Hootsuite
 

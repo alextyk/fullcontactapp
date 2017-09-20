@@ -9,8 +9,8 @@ $(document).ready(function() {
    function sendToAppHandler(message) {
      var username = "username=" + encodeURIComponent(message.post.user.username);
 
-     var handler = publicHostname + '/hs_plugin_handler.html?' + username;
+     var handler = 'https://' + window.location.hostname + '/fullcontact_plugin_handler.html?' + username;
 
-     hsp.showCustomPopup(handler, 'App Plugin popup');
+     hsp.showCustomPopup(handler, 'Full Contact Information');
    }
 });
